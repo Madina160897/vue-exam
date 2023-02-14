@@ -1,5 +1,5 @@
 const express = require("express");
-const { NewPostModel, EmailModel } = require("../Models");
+const { NewPostModel } = require("../Models");
 const router = express.Router();
 
 router.get("/", (req, res) => {
@@ -26,12 +26,12 @@ router.get("/:id", (req, res) => {
 router.post("/", async (req, res) => {
     const { email, title, post, img } = req.body;
 
-    const newPost = new NewPostModel({ email, title, post, img, like: 0 });
-    newPost.save((err) => {
-        if (err) {
+    const newPost = new NewPostModel({ email, title, post, img,  like: 0 });
+    newPost.save((err) =>{ 
+        if(err){
             res.status(500).send(err);
-        } else {
-            res.status(200).send("Added new post");
+        }else{
+            res.status(200).send("Добавлен новый пост");
         }
     });
 })
@@ -39,9 +39,8 @@ router.post("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
     const id = req.params.id;
     const { title, post, img } = req.body;
-    await NewPostModel.findByIdAndUpdate(id, { title, post, img }
-    );
-    res.send("ok")
+    await NewPostModel.findByIdAndUpdate(id, { title, post, img });
+    res.send("Изменен")
 })
 
 router.delete("/:id", (req, res) => {
@@ -50,7 +49,7 @@ router.delete("/:id", (req, res) => {
         if (err) {
             res.status(500).send(err);
         } else {
-            res.status(200).send("deleted");
+            res.status(200).send("Удален");
         }
     });
 });
@@ -58,15 +57,15 @@ router.delete("/:id", (req, res) => {
 router.get("/like/:id", async (req, res) => {
     const postId = req.params.id
     const post = await NewPostModel.findById(postId);
-    await NewPostModel.findByIdAndUpdate(postId, { like: post.like + 1 })
-    res.status(201).send("Ok");
+    await NewPostModel.findByIdAndUpdate(postId,{like: post.like + 1 })
+    res.status(201).send("Нравится");
 });
 
 router.get("/unlike/:id", async (req, res) => {
     const postId = req.params.id
     const post = await NewPostModel.findById(postId);
-    await NewPostModel.findByIdAndUpdate(postId, { like: post.like - 1 })
-    res.status(201).send("Ok");
+    await NewPostModel.findByIdAndUpdate(postId,{like: post.like - 1})
+    res.status(201).send("Не нравится");
 });
 
 module.exports = router

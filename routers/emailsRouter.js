@@ -32,7 +32,7 @@ router.post("/regis", async (req, res) => {
     const newUser = new EmailModel({ email, password, name, surname, age });
     newUser.save((err) => {
         if (err) {
-            res.status(500).send("Registration error");
+            res.status(500).send("Ошибка регистрации");
         } else {
             res.status(201).send("Пользователь успешно зарегистрирован");
         }
@@ -58,7 +58,7 @@ router.delete("/:id", (req, res) => {
         if (err) {
             res.status(500).send(err);
         } else {
-            res.status(200).send("deleted");
+            res.status(200).send("Удален");
         }
     });
 })
@@ -70,10 +70,34 @@ router.put("/:id", (req, res) => {
         if(err){
             res.status(500).send(err);
         }else{
-            res.status(200).send("ok")
+            res.status(200).send("Изменен")
 
         }
     });
 })
+
+router.post("/follow", async (req, res) => {
+    const { userId, followedUserId } = req.body;
+    const user = await EmailModel.findById(userId);
+
+    user.follows.push(followedUserId)
+    user.save((err) => {
+        if (err) {
+            res.status(500).send(err);
+        } else {
+            res.status(201).send("Пользователь подписался");
+        }
+    });
+});
+
+
+router.post("/unfollow", async (req, res) => {
+    const { userId, followedUserId } = req.body;
+    const user = await EmailModel.findById(userId);
+
+    await EmailModel.findByIdAndUpdate(userId,{follows: user.follows.filter((user) => user != followedUserId)})
+    res.status(201).send("Пользователь отписался");
+
+});
 
 module.exports = router;
